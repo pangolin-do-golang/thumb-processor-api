@@ -98,7 +98,7 @@ The documentation can be founded at the path `/docs/swagger.yaml` or accessing t
 - `cmd`: Application entry point directory for the application's main entry points, dependency injection, or commands. The web subdirectory contains the main entry point to the REST API.
 - `internal`: Directory to contain application code that should not be exposed to external packages.
     - `core`: Directory that contains the application's core business logic.
-        - `order`: Directory contains definition of the entity's heights, interfaces, repository and service of the entity Order.
+        - `thumb`: Directory contains definition of the entity's heights, interfaces, repository and service of the entity Thumb.
     - `adapters`: Directory to contain external services that will interact with the application core.
         - `db`: Directory contains the implementation of the repositories.
         - `rest`: Directory that contains the definition of the application's controllers and handlers for manipulating data provided by the controller
