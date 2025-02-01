@@ -99,7 +99,26 @@ The documentation can be founded at the path `/docs/swagger.yaml` or accessing t
 - `internal`: Directory to contain application code that should not be exposed to external packages.
     - `core`: Directory that contains the application's core business logic.
         - `thumb`: Directory contains definition of the entity's heights, interfaces, repository and service of the entity Thumb.
+        - `users`: Directory contains definition of the entity's heights, interfaces, repository and service of the entity User.
     - `adapters`: Directory to contain external services that will interact with the application core.
         - `db`: Directory contains the implementation of the repositories.
         - `rest`: Directory that contains the definition of the application's controllers and handlers for manipulating data provided by the controller
     - `domainerrors`: Directory that contains the definition of the application's domain errors.
+
+## Basic Authentication
+
+This project uses basic authentication to protect the endpoints.
+
+Example:
+
+| User  | Password |
+|-------|----------|
+| test  | test     |
+
+```curl
+curl 'http://localhost:8080/login' -H 'Authorization: Basic dGVzdDp0ZXN0'
+```
+
+## Creating new users
+
+Use the Swagger for access the endpoint `/user` and create a new user.
