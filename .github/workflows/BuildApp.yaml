@@ -41,7 +41,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          SHA: ${{ steps.short-sha.outputs.sha }}
         with:
           projectBaseDir: ./
           args: >            
