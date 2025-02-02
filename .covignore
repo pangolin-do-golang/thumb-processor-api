@@ -2,4 +2,4 @@
 mocks/
 docs/
 cmd/
-internal/adapters/rest/server.go
+internal/adapters/rest/server/*
