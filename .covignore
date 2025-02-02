@@ -2,4 +2,4 @@
 mocks/
 docs/
 cmd/
-internal/adapters/rest/server/*
+internal/adapters/rest/server/
