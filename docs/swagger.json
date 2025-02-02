@@ -8,5 +8,93 @@
     },
     "host": "localhost:8080",
     "basePath": "/",
-    "paths": {}
+    "paths": {
+        "/login": {
+            "get": {
+                "description": "Authenticates a user using Basic Authentication and returns user information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Basic Authentication credentials (username:password)",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "description": "Creates a new user with the provided nickname and password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User creation request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {}
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "nickname",
+                "password"
+            ],
+            "properties": {
+                "nickname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

@@ -1,9 +1,68 @@
 basePath: /
+definitions:
+  handler.CreateUserRequest:
+    properties:
+      nickname:
+        type: string
+      password:
+        type: string
+    required:
+    - nickname
+    - password
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: Hackathon
   title: Thumb processor worker
   version: 0.1.0
-paths: {}
+paths:
+  /login:
+    get:
+      consumes:
+      - application/json
+      description: Authenticates a user using Basic Authentication and returns user
+        information.
+      parameters:
+      - description: Basic Authentication credentials (username:password)
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+      summary: User Login
+      tags:
+      - Auth
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user with the provided nickname and password.
+      parameters:
+      - description: User creation request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema: {}
+        "400":
+          description: Bad request
+          schema: {}
+      summary: Create a new user
+      tags:
+      - users
 swagger: "2.0"
