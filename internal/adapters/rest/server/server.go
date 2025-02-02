@@ -22,6 +22,7 @@ func NewRestServer(_ *RestServerOptions) *RestServer {
 func (rs RestServer) Serve() {
 	r := gin.Default()
 	r.Use(middleware.CorsMiddleware())
+
 	r.GET("/health", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
