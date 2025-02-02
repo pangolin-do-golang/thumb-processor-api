@@ -1,12 +1,10 @@
 package server
 
 import (
-	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/handler"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
 )
 
 type RestServer struct {
@@ -22,9 +20,9 @@ func NewRestServer(_ *RestServerOptions) *RestServer {
 func (rs RestServer) Serve() {
 	r := gin.Default()
 	r.Use(middleware.CorsMiddleware())
-	r.GET("/health", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
+
+	handler.RegisterHealthCheck(r)
+
 	handler.RegisterSwaggerHandlers(r)
 
 	handler.RegisterUserRoutes(r)
