@@ -28,8 +28,8 @@ func (h *ThumbHandler) RegisterRoutes(router *gin.Engine) {
 }
 
 // @Summary Create a new thumbnail process
-// @Description Start a new asynchronous thumbnail generation process
-// @Tags thumbs
+// @Description Start a new asynchronous thumbnail generation process from S3 video URL
+// @Tags Video Thumbs Processor
 // @Accept json
 // @Produce json
 // @Param request body CreateProcessRequest true "Video URL"
@@ -70,7 +70,7 @@ func (h *ThumbHandler) CreateProcess(c *gin.Context) {
 
 // @Summary Update a thumbnail process
 // @Description Update the status of an existing thumbnail process
-// @Tags thumbs
+// @Tags Video Thumbs Processor
 // @Accept json
 // @Produce json
 // @Param id path string true "Process ID"
@@ -121,7 +121,7 @@ func (h *ThumbHandler) UpdateProcess(c *gin.Context) {
 
 // @Summary List all thumbnail processes
 // @Description Get a list of all thumbnail processes
-// @Tags thumbs
+// @Tags Video Thumbs Processor
 // @Produce json
 // @Success 200 {array} ThumbProcessResponse
 // @Failure 500 {object} ErrorResponse

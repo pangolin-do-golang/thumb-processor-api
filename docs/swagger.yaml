@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  handler.CreateProcessRequest:
+    properties:
+      url:
+        type: string
+    required:
+    - url
+    type: object
   handler.CreateUserRequest:
     properties:
       nickname:
@@ -10,6 +17,37 @@ definitions:
     - nickname
     - password
     type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handler.ThumbProcessResponse:
+    properties:
+      created_at:
+        type: string
+      error:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      thumbnail_path:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handler.UpdateProcessRequest:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+      thumbnail_path:
+        type: string
+    required:
+    - status
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -17,6 +55,20 @@ info:
   title: Thumb processor worker
   version: 0.1.0
 paths:
+  /health:
+    get:
+      description: Checks the health status of the application.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - Health Check
   /login:
     get:
       consumes:
@@ -41,6 +93,94 @@ paths:
       summary: User Login
       tags:
       - Auth
+  /thumbs:
+    get:
+      description: Get a list of all thumbnail processes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.ThumbProcessResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: List all thumbnail processes
+      tags:
+      - Video Thumbs Processor
+    post:
+      consumes:
+      - application/json
+      description: Start a new asynchronous thumbnail generation process from S3 video
+        URL
+      parameters:
+      - description: Video URL
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateProcessRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Process started
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a new thumbnail process
+      tags:
+      - Video Thumbs Processor
+  /thumbs/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of an existing thumbnail process
+      parameters:
+      - description: Process ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Process update information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateProcessRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ThumbProcessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update a thumbnail process
+      tags:
+      - Video Thumbs Processor
   /user:
     post:
       consumes:
