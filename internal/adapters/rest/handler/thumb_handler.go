@@ -20,7 +20,7 @@ func NewThumbHandler(service thumb.IThumbService) *ThumbHandler {
 	}
 }
 
-func (h *ThumbHandler) RegisterRoutes(router *gin.Engine) {
+func (h *ThumbHandler) RegisterRoutes(router *gin.RouterGroup) {
 	thumbGroup := router.Group("/thumbs")
 	thumbGroup.POST("", h.CreateProcess)
 	thumbGroup.PUT("/:id", h.UpdateProcess)

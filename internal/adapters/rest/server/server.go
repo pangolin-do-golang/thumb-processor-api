@@ -37,7 +37,7 @@ func (rs RestServer) Serve() {
 
 	handler.RegisterLoginHandlers(authorizedGroup)
 
-	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(r)
+	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(authorizedGroup)
 
 	err := r.Run("0.0.0.0:8080")
 	if err != nil {
