@@ -36,7 +36,7 @@ func (r *PostgresThumbRepository) Create(process *entity.ThumbProcess) error {
 	return result.Error
 }
 
-func (r *PostgresThumbRepository) List() []entity.ThumbProcess {
+func (r *PostgresThumbRepository) List() *[]entity.ThumbProcess {
 	processes := []entity.ThumbProcess{}
 	records := []ThumbPostgres{}
 
@@ -56,16 +56,16 @@ func (r *PostgresThumbRepository) List() []entity.ThumbProcess {
 		})
 	}
 
-	return processes
+	return &processes
 }
 
 func NewPostgresThumbRepository(db IDB) *PostgresThumbRepository {
 	return &PostgresThumbRepository{db: db}
 }
 
-func (r *PostgresThumbRepository) Update(process *entity.ThumbProcess) error {
+func (r *PostgresThumbRepository) Update(process *entity.ThumbProcess) (*entity.ThumbProcess, error) {
 	if process.ID == uuid.Nil {
-		return errors.New("process id is required")
+		return nil, errors.New("process id is required")
 	}
 
 	result := r.db.Save(&ThumbPostgres{
@@ -78,5 +78,19 @@ func (r *PostgresThumbRepository) Update(process *entity.ThumbProcess) error {
 		Error:         process.Error,
 	})
 
-	return result.Error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &entity.ThumbProcess{
+		ID:     process.ID,
+		Status: process.Status,
+		Error:  process.Error,
+		Video: entity.ThumbProcessVideo{
+			Path: process.Video.Path,
+		},
+		Thumbnail: entity.ThumbProcessThumb{
+			Path: process.Thumbnail.Path,
+		},
+	}, nil
 }

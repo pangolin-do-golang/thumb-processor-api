@@ -88,7 +88,7 @@ func TestPostgresThumbRepository_List(t *testing.T) {
 				}
 			}).Return(&gorm.DB{}).Once()
 
-		processes := repo.List()
+		processes := *repo.List()
 
 		assert.Len(t, processes, 2)
 		assert.Equal(t, "video1.mp4", processes[0].Video.Path)
@@ -132,9 +132,10 @@ func TestPostgresThumbRepository_Update(t *testing.T) {
 
 		mockDB.On("Save", mock.AnythingOfType("*db.ThumbPostgres")).Return(&gorm.DB{}).Once()
 
-		err := repo.Update(process)
+		updated, err := repo.Update(process)
 
 		assert.NoError(t, err)
+		assert.NotNil(t, updated)
 	})
 
 	t.Run("update with missing ID", func(t *testing.T) {
@@ -149,8 +150,9 @@ func TestPostgresThumbRepository_Update(t *testing.T) {
 			Error:  "",
 		}
 
-		err := repo.Update(process)
+		updated, err := repo.Update(process)
 
+		assert.Nil(t, updated)
 		assert.Error(t, err)
 		assert.Equal(t, "process id is required", err.Error())
 		mockDB.AssertNotCalled(t, "Save")
@@ -173,8 +175,9 @@ func TestPostgresThumbRepository_Update(t *testing.T) {
 		expectedError := errors.New("database error")
 		mockDB.On("Save", mock.AnythingOfType("*db.ThumbPostgres")).Return(&gorm.DB{Error: expectedError}).Once()
 
-		err := repo.Update(process)
+		updated, err := repo.Update(process)
 
+		assert.Nil(t, updated)
 		assert.Error(t, err)
 		assert.Equal(t, expectedError, err)
 	})
