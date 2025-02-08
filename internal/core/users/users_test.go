@@ -52,3 +52,54 @@ func TestCreateUser(t *testing.T) {
 		{Nickname: "prod", Password: "prod"},
 	}
 }
+
+func TestGetUserByNickname(t *testing.T) {
+	// Test case 1: User exists
+	existingUser := "user"
+	user := GetUserByNickname(existingUser)
+
+	if user == nil {
+		t.Errorf("GetUserByNickname(%s) returned nil, expected a user", existingUser)
+	} else if user.Nickname != existingUser {
+		t.Errorf("GetUserByNickname(%s) returned user with nickname %s, expected %s", existingUser, user.Nickname, existingUser)
+	}
+
+	// Test case 2: User does not exist
+	nonExistingUser := "nonexistent"
+	user = GetUserByNickname(nonExistingUser)
+
+	if user != nil {
+		t.Errorf("GetUserByNickname(%s) returned a user, expected nil", nonExistingUser)
+	}
+
+	// Test case 3: Empty nickname
+	emptyNickname := ""
+	user = GetUserByNickname(emptyNickname)
+
+	if user != nil {
+		t.Errorf("GetUserByNickname(%s) returned a user, expected nil", emptyNickname)
+	}
+
+	// Test case 4: Check if the returned user is a copy, not a reference to the original slice
+	originalUsers := users // Keep a copy of the original users slice
+
+	testNickname := "test_copy"
+	testPassword := "password_copy"
+	CreateUser(testNickname, testPassword) // Add a new user
+
+	retrievedUser := GetUserByNickname(testNickname)
+	if retrievedUser == nil {
+		t.Errorf("GetUserByNickname(%s) returned nil, expected a user", testNickname)
+	}
+
+	retrievedUser.Password = "modified_password" // Modify the retrieved user's password
+
+	originalRetrievedUser := GetUserByNickname(testNickname) //Get again the user
+
+	if originalRetrievedUser.Password == "modified_password" {
+		t.Errorf("GetUserByNickname returned a pointer to the original user in the slice. Should return a copy")
+	}
+	
+	users = originalUsers
+
+}
