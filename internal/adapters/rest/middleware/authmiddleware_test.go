@@ -22,9 +22,9 @@ func TestAuthMiddleware(t *testing.T) {
 	}{
 		{
 			name:             "Valid Credentials",
-			username:         "testuser",
+			username:         "test",
 			password:         "testpassword",
-			allowedUsersFunc: func() gin.Accounts { return gin.Accounts{"testuser": "testpassword"} },
+			allowedUsersFunc: func() gin.Accounts { return gin.Accounts{"test": "testpassword"} },
 			expectedStatus:   http.StatusOK, // Or 200 if you're checking for a successful continuation
 			expectedMessage:  "",            // No message expected on success
 		},
