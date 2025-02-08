@@ -21,7 +21,8 @@ func setupTest() (*gin.Engine, *servicemocks.IThumbService) {
 	router := gin.New()
 	mockService := new(servicemocks.IThumbService)
 	handler := NewThumbHandler(mockService)
-	handler.RegisterRoutes(router)
+	group := router.Group("/")
+	handler.RegisterRoutes(group)
 	return router, mockService
 }
 
