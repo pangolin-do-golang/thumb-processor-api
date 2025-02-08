@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	_ "github.com/pangolin-do-golang/thumb-processor-api/docs"
 	dbAdapter "github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/db"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/server"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -41,15 +39,12 @@ func main() {
 }
 
 func initDb() (*gorm.DB, error) {
-	_ = godotenv.Load()
-	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable TimeZone=America/Sao_Paulo",
-		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	db, err := gorm.Open(postgres.Open(cfg.DB.GetDNS()), &gorm.Config{})
 	if err != nil {
 		log.Panic(err)
 	}
