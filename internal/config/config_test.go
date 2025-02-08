@@ -89,23 +89,3 @@ func TestLoad(t *testing.T) {
 		})
 	}
 }
-
-// Example of a test for a function that uses the config
-func TestSomethingThatUsesConfig(t *testing.T) {
-	// Set necessary environment variables
-	os.Setenv("S3_BUCKET", "test-bucket")
-	os.Setenv("SQS_QUEUE_URL", "test-queue")
-	defer func() {
-		os.Unsetenv("S3_BUCKET")
-		os.Unsetenv("SQS_QUEUE_URL")
-	}()
-
-	cfg, err := Load()
-	assert.NoError(t, err)
-
-	// Now you can use cfg in your assertions or test logic
-	assert.Equal(t, "test-bucket", cfg.S3.Bucket)
-	assert.Equal(t, "test-queue", cfg.SQS.QueueURL)
-
-	// ... your test logic here ...
-}

@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -52,6 +53,42 @@ func TestCreateProcess(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
+
+	t.Run("service error", func(t *testing.T) {
+		mockService.On("CreateProcessAsync", mock.AnythingOfType("*ports.CreateProcessRequest")).
+			Return(errors.New("service error")).Once()
+
+		body := CreateProcessRequest{URL: "https://example.com/video.mp4"}
+		jsonBody, _ := json.Marshal(body)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/thumbs", bytes.NewBuffer(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+		var response ErrorResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "service error", response.Error)
+	})
+
+	t.Run("api bind json error", func(t *testing.T) {
+		invalidJSON := []byte(`{"url": invalid-json}`)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/thumbs", bytes.NewBuffer(invalidJSON))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		var response ErrorResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Invalid request format", response.Error)
+	})
 }
 
 func TestUpdateProcess(t *testing.T) {
@@ -81,6 +118,66 @@ func TestUpdateProcess(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("api bind ID param error", func(t *testing.T) {
+		body := UpdateProcessRequest{
+			Status:        "completed",
+			ThumbnailPath: "path/to/thumbnail.jpg",
+		}
+		jsonBody, _ := json.Marshal(body)
+
+		w := httptest.NewRecorder()
+
+		req, _ := http.NewRequest("PUT", "/thumbs/invalid-uuid", bytes.NewBuffer(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		var response ErrorResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Process ID is required", response.Error)
+	})
+
+	t.Run("api bind json error", func(t *testing.T) {
+		invalidJSON := []byte(`{"status": invalid-json}`)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("PUT", "/thumbs/"+mockedUUID.String(), bytes.NewBuffer(invalidJSON))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		var response ErrorResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Invalid request format", response.Error)
+	})
+
+	t.Run("service error", func(t *testing.T) {
+		mockService.On("UpdateProcess", mock.AnythingOfType("*ports.UpdateProcessRequest")).
+			Return(nil, errors.New("service error")).Once()
+
+		body := UpdateProcessRequest{
+			Status:        "completed",
+			ThumbnailPath: "path/to/thumbnail.jpg",
+		}
+		jsonBody, _ := json.Marshal(body)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("PUT", "/thumbs/"+mockedUUID.String(), bytes.NewBuffer(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+		var response ErrorResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "service error", response.Error)
 	})
 }
 
