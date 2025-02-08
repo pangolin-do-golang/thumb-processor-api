@@ -4,17 +4,22 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/handler"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/thumb"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
 )
 
 type RestServer struct {
+	thumbService thumb.IThumbService
 }
 
 type RestServerOptions struct {
+	ThumService thumb.IThumbService
 }
 
-func NewRestServer(_ *RestServerOptions) *RestServer {
-	return &RestServer{}
+func NewRestServer(opts *RestServerOptions) *RestServer {
+	return &RestServer{
+		thumbService: opts.ThumService,
+	}
 }
 
 func (rs RestServer) Serve() {
@@ -31,6 +36,8 @@ func (rs RestServer) Serve() {
 	authorizedGroup := r.Group("/", middleware.AuthMiddleware(users.GetAllowedUsers))
 
 	handler.RegisterLoginHandlers(authorizedGroup)
+
+	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(authorizedGroup)
 
 	err := r.Run("0.0.0.0:8080")
 	if err != nil {
