@@ -323,7 +323,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Thumb processor worker",
+	Title:            "Thumb Processor API",
 	Description:      "Hackathon",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

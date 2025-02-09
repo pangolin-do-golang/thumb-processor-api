@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// @title Thumb processor worker
+// @title Thumb Processor API
 // @version 0.1.0
 // @description Hackathon
 
