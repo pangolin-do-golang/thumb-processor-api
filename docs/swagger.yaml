@@ -52,7 +52,7 @@ host: localhost:8080
 info:
   contact: {}
   description: Hackathon
-  title: Thumb processor worker
+  title: Thumb Processor API
   version: 0.1.0
 paths:
   /health:
