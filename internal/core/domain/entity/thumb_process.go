@@ -16,6 +16,7 @@ var AllowedProcessStatus = map[string]bool{
 
 type ThumbProcess struct {
 	ID        uuid.UUID         `json:"id"`
+	UserEmail string            `json:"user_email"`
 	Video     ThumbProcessVideo `json:"video"`
 	Status    string            `json:"status"`
 	Error     string            `json:"error,omitempty"`
@@ -30,8 +31,10 @@ type ThumbProcessThumb struct {
 	Path string `json:"url"`
 }
 
-func NewThumbProcess(url string) *ThumbProcess {
+func NewThumbProcess(url, email string) *ThumbProcess {
 	return &ThumbProcess{
+		ID:        uuid.New(),
+		UserEmail: email,
 		Video: ThumbProcessVideo{
 			Path: url,
 		},

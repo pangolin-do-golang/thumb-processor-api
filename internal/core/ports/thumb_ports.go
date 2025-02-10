@@ -3,7 +3,8 @@ package ports
 import "github.com/google/uuid"
 
 type CreateProcessRequest struct {
-	Url string `json:"url"`
+	UserEmail string `json:"user_email"`
+	Url       string `json:"url"`
 }
 
 type UpdateProcessRequest struct {

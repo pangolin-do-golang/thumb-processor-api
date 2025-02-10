@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/ports"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/thumb"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
+	"net/http"
 )
 
 type ThumbHandler struct {
@@ -22,9 +22,9 @@ func NewThumbHandler(service thumb.IThumbService) *ThumbHandler {
 
 func (h *ThumbHandler) RegisterRoutes(router *gin.RouterGroup) {
 	thumbGroup := router.Group("/thumbs")
-	thumbGroup.POST("", h.CreateProcess)
+	thumbGroup.POST("", middleware.AuthMiddleware(users.GetAllowedUsers), h.CreateProcess)
 	thumbGroup.PUT("/:id", h.UpdateProcess)
-	thumbGroup.GET("", h.ListProcesses)
+	thumbGroup.GET("", middleware.AuthMiddleware(users.GetAllowedUsers), h.ListProcesses)
 }
 
 // @Summary Create a new thumbnail process
@@ -53,8 +53,14 @@ func (h *ThumbHandler) CreateProcess(c *gin.Context) {
 		return
 	}
 
+	var userEmail string
+	ctxUser, ok := c.Get("user")
+	if ok {
+		userEmail = ctxUser.(string)
+	}
 	err := h.thumbService.CreateProcessAsync(&ports.CreateProcessRequest{
-		Url: request.URL,
+		UserEmail: userEmail,
+		Url:       request.URL,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
@@ -153,12 +159,10 @@ type UpdateProcessRequest struct {
 }
 
 type ThumbProcessResponse struct {
-	ID            string    `json:"id"`
-	Status        string    `json:"status"`
-	Error         string    `json:"error,omitempty"`
-	ThumbnailPath string    `json:"thumbnail_path,omitempty"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            string `json:"id"`
+	Status        string `json:"status"`
+	Error         string `json:"error,omitempty"`
+	ThumbnailPath string `json:"thumbnail_path,omitempty"`
 }
 
 type ErrorResponse struct {
