@@ -446,6 +446,26 @@ func (_m *IDB) Update(column string, value interface{}) *gorm.DB {
 	return r0
 }
 
+// Updates provides a mock function with given fields: values
+func (_m *IDB) Updates(values interface{}) *gorm.DB {
+	ret := _m.Called(values)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Updates")
+	}
+
+	var r0 *gorm.DB
+	if rf, ok := ret.Get(0).(func(interface{}) *gorm.DB); ok {
+		r0 = rf(values)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*gorm.DB)
+		}
+	}
+
+	return r0
+}
+
 // Where provides a mock function with given fields: query, args
 func (_m *IDB) Where(query interface{}, args ...interface{}) *gorm.DB {
 	var _ca []interface{}

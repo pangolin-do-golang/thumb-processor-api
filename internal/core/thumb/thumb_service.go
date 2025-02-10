@@ -1,15 +1,18 @@
 package thumb
 
 import (
+	"context"
+	"errors"
+
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/domain/contracts"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/domain/entity"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/ports"
 )
 
 type IThumbService interface {
-	CreateProcessAsync(request *ports.CreateProcessRequest) error
-	UpdateProcess(request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error)
-	ListProcess() *[]entity.ThumbProcess
+	CreateProcessAsync(ctx context.Context, request *ports.CreateProcessRequest) error
+	UpdateProcess(ctx context.Context, request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error)
+	ListProcess(ctx context.Context) *[]entity.ThumbProcess
 }
 
 type Service struct {
@@ -21,21 +24,25 @@ func NewThumbService(repo contracts.IThumbRepositoryAdapter, q contracts.IThumbQ
 	return &Service{processRepository: repo, queueAdapter: q}
 }
 
-func (s *Service) CreateProcessAsync(request *ports.CreateProcessRequest) error {
+func (s *Service) CreateProcessAsync(ctx context.Context, request *ports.CreateProcessRequest) error {
 	thumbProcess := entity.NewThumbProcess(request.Url, request.UserEmail)
 
-	if err := s.processRepository.Create(thumbProcess); err != nil {
+	if err := s.processRepository.Create(ctx, thumbProcess); err != nil {
 		return err
 	}
 
-	if err := s.queueAdapter.SendEvent(thumbProcess); err != nil {
+	if err := s.queueAdapter.SendEvent(ctx, thumbProcess); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) UpdateProcess(request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error) {
+func (s *Service) UpdateProcess(ctx context.Context, request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error) {
+	if !entity.AllowedProcessStatus[request.Status] {
+		return nil, errors.New("informed status not allowed")
+	}
+
 	thumbProcess := &entity.ThumbProcess{
 		ID:        request.ID,
 		Status:    request.Status,
@@ -43,7 +50,7 @@ func (s *Service) UpdateProcess(request *ports.UpdateProcessRequest) (*entity.Th
 		Thumbnail: entity.ThumbProcessThumb{Path: request.ThumbnailPath},
 	}
 
-	updated, err := s.processRepository.Update(thumbProcess)
+	updated, err := s.processRepository.Update(ctx, thumbProcess)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +58,8 @@ func (s *Service) UpdateProcess(request *ports.UpdateProcessRequest) (*entity.Th
 	return updated, nil
 }
 
-func (s *Service) ListProcess() *[]entity.ThumbProcess {
-	processList := s.processRepository.List()
+func (s *Service) ListProcess(ctx context.Context) *[]entity.ThumbProcess {
+	processList := s.processRepository.List(ctx)
 
 	return processList
 }

@@ -1,6 +1,7 @@
 package thumb
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -20,27 +21,27 @@ func TestCreateProcessAsync(t *testing.T) {
 	service := NewThumbService(mockRepo, mockQueue)
 
 	t.Run("successful creation", func(t *testing.T) {
-		mockRepo.On("Create", mock.AnythingOfType("*entity.ThumbProcess")).Return(nil).Once()
-		mockQueue.On("SendEvent", mock.AnythingOfType("*entity.ThumbProcess")).Return(nil).Once()
+		mockRepo.On("Create", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(nil).Once()
+		mockQueue.On("SendEvent", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(nil).Once()
 
-		err := service.CreateProcessAsync(testAppRequest)
+		err := service.CreateProcessAsync(context.Background(), testAppRequest)
 
 		assert.NoError(t, err)
 	})
 
 	t.Run("repository error", func(t *testing.T) {
-		mockRepo.On("Create", mock.AnythingOfType("*entity.ThumbProcess")).Return(errors.New("db error")).Once()
+		mockRepo.On("Create", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(errors.New("db error")).Once()
 
-		err := service.CreateProcessAsync(testAppRequest)
+		err := service.CreateProcessAsync(context.Background(), testAppRequest)
 
 		assert.Error(t, err)
 	})
 
 	t.Run("queue error", func(t *testing.T) {
-		mockRepo.On("Create", mock.AnythingOfType("*entity.ThumbProcess")).Return(nil)
-		mockQueue.On("SendEvent", mock.AnythingOfType("*entity.ThumbProcess")).Return(errors.New("queue error")).Once()
+		mockRepo.On("Create", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(nil)
+		mockQueue.On("SendEvent", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(errors.New("queue error")).Once()
 
-		err := service.CreateProcessAsync(testAppRequest)
+		err := service.CreateProcessAsync(context.Background(), testAppRequest)
 
 		assert.Error(t, err)
 	})
@@ -56,8 +57,8 @@ func TestListProcess(t *testing.T) {
 		*entity.NewThumbProcess("https://example.com/video2.mp4", "teste@teste.com"),
 	}
 
-	mockRepo.On("List").Return(expectedList)
-	result := service.ListProcess()
+	mockRepo.On("List", mock.AnythingOfType("context.backgroundCtx")).Return(expectedList)
+	result := service.ListProcess(context.Background())
 
 	assert.Equal(t, expectedList, result)
 }
@@ -83,18 +84,18 @@ func TestUpdateProcess(t *testing.T) {
 	}
 
 	t.Run("successful creation", func(t *testing.T) {
-		mockRepo.On("Update", thumbProcess).Return(thumbProcess, nil).Once()
+		mockRepo.On("Update", mock.AnythingOfType("context.backgroundCtx"), thumbProcess).Return(thumbProcess, nil).Once()
 
-		updated, err := service.UpdateProcess(request)
+		updated, err := service.UpdateProcess(context.Background(), request)
 
 		assert.NotNil(t, updated)
 		assert.NoError(t, err)
 	})
 
 	t.Run("repository error", func(t *testing.T) {
-		mockRepo.On("Update", mock.AnythingOfType("*entity.ThumbProcess")).Return(nil, errors.New("db error")).Once()
+		mockRepo.On("Update", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*entity.ThumbProcess")).Return(nil, errors.New("db error")).Once()
 
-		updated, err := service.UpdateProcess(request)
+		updated, err := service.UpdateProcess(context.Background(), request)
 		assert.Nil(t, updated)
 		assert.Error(t, err)
 	})

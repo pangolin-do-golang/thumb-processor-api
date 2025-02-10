@@ -42,7 +42,7 @@ func main() {
 		ThumService: thumbService,
 	})
 
-	restServer.Serve()
+	restServer.Serve(cfg)
 }
 
 func newDatabaseConnection(cfg *config.Config) (*gorm.DB, error) {

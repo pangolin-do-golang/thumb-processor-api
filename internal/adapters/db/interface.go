@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+
 	"gorm.io/gorm"
 )
 
@@ -19,6 +20,7 @@ type IDB interface {
 	Last(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Update(column string, value interface{}) (tx *gorm.DB)
+	Updates(values interface{}) (tx *gorm.DB)
 	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
 	Count(count *int64) (tx *gorm.DB)
 	Row() *sql.Row

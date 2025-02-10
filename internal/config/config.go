@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 )
 
 type S3 struct {
@@ -18,9 +19,18 @@ type Config struct {
 	S3  S3
 	SQS SQS
 	DB  Database
+	API API
+}
+
+type API struct {
+	Port string `env:"API_PORT"`
 }
 
 func Load() (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		return nil, err
+	}
+
 	cfg := Config{}
 	err := env.Parse(&cfg)
 	return &cfg, err

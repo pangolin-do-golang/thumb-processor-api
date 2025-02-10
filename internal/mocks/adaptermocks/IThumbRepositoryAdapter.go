@@ -3,7 +3,10 @@
 package adaptermocks
 
 import (
+	context "context"
+
 	entity "github.com/pangolin-do-golang/thumb-processor-api/internal/core/domain/entity"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -12,17 +15,17 @@ type IThumbRepositoryAdapter struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: process
-func (_m *IThumbRepositoryAdapter) Create(process *entity.ThumbProcess) error {
-	ret := _m.Called(process)
+// Create provides a mock function with given fields: ctx, process
+func (_m *IThumbRepositoryAdapter) Create(ctx context.Context, process *entity.ThumbProcess) error {
+	ret := _m.Called(ctx, process)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*entity.ThumbProcess) error); ok {
-		r0 = rf(process)
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.ThumbProcess) error); ok {
+		r0 = rf(ctx, process)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -30,17 +33,17 @@ func (_m *IThumbRepositoryAdapter) Create(process *entity.ThumbProcess) error {
 	return r0
 }
 
-// List provides a mock function with no fields
-func (_m *IThumbRepositoryAdapter) List() *[]entity.ThumbProcess {
-	ret := _m.Called()
+// List provides a mock function with given fields: ctx
+func (_m *IThumbRepositoryAdapter) List(ctx context.Context) *[]entity.ThumbProcess {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
 	}
 
 	var r0 *[]entity.ThumbProcess
-	if rf, ok := ret.Get(0).(func() *[]entity.ThumbProcess); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(context.Context) *[]entity.ThumbProcess); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*[]entity.ThumbProcess)
@@ -50,9 +53,9 @@ func (_m *IThumbRepositoryAdapter) List() *[]entity.ThumbProcess {
 	return r0
 }
 
-// Update provides a mock function with given fields: process
-func (_m *IThumbRepositoryAdapter) Update(process *entity.ThumbProcess) (*entity.ThumbProcess, error) {
-	ret := _m.Called(process)
+// Update provides a mock function with given fields: ctx, process
+func (_m *IThumbRepositoryAdapter) Update(ctx context.Context, process *entity.ThumbProcess) (*entity.ThumbProcess, error) {
+	ret := _m.Called(ctx, process)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
@@ -60,19 +63,19 @@ func (_m *IThumbRepositoryAdapter) Update(process *entity.ThumbProcess) (*entity
 
 	var r0 *entity.ThumbProcess
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*entity.ThumbProcess) (*entity.ThumbProcess, error)); ok {
-		return rf(process)
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.ThumbProcess) (*entity.ThumbProcess, error)); ok {
+		return rf(ctx, process)
 	}
-	if rf, ok := ret.Get(0).(func(*entity.ThumbProcess) *entity.ThumbProcess); ok {
-		r0 = rf(process)
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.ThumbProcess) *entity.ThumbProcess); ok {
+		r0 = rf(ctx, process)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.ThumbProcess)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*entity.ThumbProcess) error); ok {
-		r1 = rf(process)
+	if rf, ok := ret.Get(1).(func(context.Context, *entity.ThumbProcess) error); ok {
+		r1 = rf(ctx, process)
 	} else {
 		r1 = ret.Error(1)
 	}

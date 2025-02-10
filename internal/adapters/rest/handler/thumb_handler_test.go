@@ -23,6 +23,7 @@ func setupTest() (*gin.Engine, *servicemocks.IThumbService) {
 	handler := NewThumbHandler(mockService)
 	group := router.Group("/")
 	handler.RegisterRoutes(group)
+	handler.RegisterInternalRoutes(router)
 	return router, mockService
 }
 
@@ -39,7 +40,7 @@ func TestUpdateProcess(t *testing.T) {
 			},
 		}
 
-		mockService.On("UpdateProcess", mock.AnythingOfType("*ports.UpdateProcessRequest")).Return(updatedProcess, nil).Once()
+		mockService.On("UpdateProcess", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*ports.UpdateProcessRequest")).Return(updatedProcess, nil).Once()
 
 		body := UpdateProcessRequest{
 			Status:        "completed",
@@ -93,7 +94,7 @@ func TestUpdateProcess(t *testing.T) {
 	})
 
 	t.Run("service error", func(t *testing.T) {
-		mockService.On("UpdateProcess", mock.AnythingOfType("*ports.UpdateProcessRequest")).
+		mockService.On("UpdateProcess", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*ports.UpdateProcessRequest")).
 			Return(nil, errors.New("service error")).Once()
 
 		body := UpdateProcessRequest{
@@ -120,17 +121,14 @@ func TestCreateProcess(t *testing.T) {
 	router, mockService := setupTest()
 
 	t.Run("successful create", func(t *testing.T) {
-		body := CreateProcessRequest{
-			URL: "http://example.com/video.mp4",
-		}
-		jsonBody, _ := json.Marshal(body)
+		mockService.On("CreateProcessAsync", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*ports.CreateProcessRequest")).Return(nil).Once()
 
-		mockService.On("CreateProcessAsync", mock.AnythingOfType("*ports.CreateProcessRequest")).Return(nil).Once()
+		body := CreateProcessRequest{URL: "https://example.com/video.mp4"}
+		jsonBody, _ := json.Marshal(body)
 
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("POST", "/thumbs", bytes.NewBuffer(jsonBody))
 		req.Header.Set("Content-Type", "application/json")
-		req.SetBasicAuth("test", "test")
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusAccepted, w.Code)
@@ -170,12 +168,13 @@ func TestCreateProcess(t *testing.T) {
 	})
 
 	t.Run("service error", func(t *testing.T) {
+		mockService.On("CreateProcessAsync", mock.AnythingOfType("context.backgroundCtx"), mock.AnythingOfType("*ports.CreateProcessRequest")).
+			Return(errors.New("service error")).Once()
+
 		body := CreateProcessRequest{
-			URL: "http://example.com/video.mp4",
+			URL: "test",
 		}
 		jsonBody, _ := json.Marshal(body)
-
-		mockService.On("CreateProcessAsync", mock.AnythingOfType("*ports.CreateProcessRequest")).Return(errors.New("service error")).Once()
 
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("POST", "/thumbs", bytes.NewBuffer(jsonBody))
@@ -209,7 +208,7 @@ func TestListProcesses(t *testing.T) {
 		},
 	}
 
-	mockService.On("ListProcess").Return(processes).Once()
+	mockService.On("ListProcess", mock.AnythingOfType("context.backgroundCtx")).Return(processes).Once()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/thumbs", nil)

@@ -1,13 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/ports"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/thumb"
-	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
-	"net/http"
 )
 
 type ThumbHandler struct {
@@ -22,9 +21,13 @@ func NewThumbHandler(service thumb.IThumbService) *ThumbHandler {
 
 func (h *ThumbHandler) RegisterRoutes(router *gin.RouterGroup) {
 	thumbGroup := router.Group("/thumbs")
-	thumbGroup.POST("", middleware.AuthMiddleware(users.GetAllowedUsers), h.CreateProcess)
+	thumbGroup.POST("", h.CreateProcess)
+	thumbGroup.GET("", h.ListProcesses)
+}
+
+func (h *ThumbHandler) RegisterInternalRoutes(router *gin.Engine) {
+	thumbGroup := router.Group("/thumbs")
 	thumbGroup.PUT("/:id", h.UpdateProcess)
-	thumbGroup.GET("", middleware.AuthMiddleware(users.GetAllowedUsers), h.ListProcesses)
 }
 
 // @Summary Create a new thumbnail process
@@ -58,7 +61,7 @@ func (h *ThumbHandler) CreateProcess(c *gin.Context) {
 	if ok {
 		userEmail = ctxUser.(string)
 	}
-	err := h.thumbService.CreateProcessAsync(&ports.CreateProcessRequest{
+	err := h.thumbService.CreateProcessAsync(c.Request.Context(), &ports.CreateProcessRequest{
 		UserEmail: userEmail,
 		Url:       request.URL,
 	})
@@ -103,7 +106,7 @@ func (h *ThumbHandler) UpdateProcess(c *gin.Context) {
 		return
 	}
 
-	updated, err := h.thumbService.UpdateProcess(&ports.UpdateProcessRequest{
+	updated, err := h.thumbService.UpdateProcess(c.Request.Context(), &ports.UpdateProcessRequest{
 		ID:            id,
 		Status:        request.Status,
 		Error:         request.Error,
@@ -133,7 +136,7 @@ func (h *ThumbHandler) UpdateProcess(c *gin.Context) {
 // @Failure 500 {object} ErrorResponse
 // @Router /thumbs [get]
 func (h *ThumbHandler) ListProcesses(c *gin.Context) {
-	processes := h.thumbService.ListProcess()
+	processes := h.thumbService.ListProcess(c.Request.Context())
 
 	response := make([]ThumbProcessResponse, len(*processes))
 	for i, process := range *processes {
