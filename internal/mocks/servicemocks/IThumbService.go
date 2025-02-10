@@ -3,6 +3,8 @@
 package servicemocks
 
 import (
+	context "context"
+
 	entity "github.com/pangolin-do-golang/thumb-processor-api/internal/core/domain/entity"
 	mock "github.com/stretchr/testify/mock"
 
@@ -14,17 +16,17 @@ type IThumbService struct {
 	mock.Mock
 }
 
-// CreateProcessAsync provides a mock function with given fields: request
-func (_m *IThumbService) CreateProcessAsync(request *ports.CreateProcessRequest) error {
-	ret := _m.Called(request)
+// CreateProcessAsync provides a mock function with given fields: ctx, request
+func (_m *IThumbService) CreateProcessAsync(ctx context.Context, request *ports.CreateProcessRequest) error {
+	ret := _m.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateProcessAsync")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*ports.CreateProcessRequest) error); ok {
-		r0 = rf(request)
+	if rf, ok := ret.Get(0).(func(context.Context, *ports.CreateProcessRequest) error); ok {
+		r0 = rf(ctx, request)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -32,17 +34,17 @@ func (_m *IThumbService) CreateProcessAsync(request *ports.CreateProcessRequest)
 	return r0
 }
 
-// ListProcess provides a mock function with no fields
-func (_m *IThumbService) ListProcess() *[]entity.ThumbProcess {
-	ret := _m.Called()
+// ListProcess provides a mock function with given fields: ctx
+func (_m *IThumbService) ListProcess(ctx context.Context) *[]entity.ThumbProcess {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListProcess")
 	}
 
 	var r0 *[]entity.ThumbProcess
-	if rf, ok := ret.Get(0).(func() *[]entity.ThumbProcess); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(context.Context) *[]entity.ThumbProcess); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*[]entity.ThumbProcess)
@@ -52,9 +54,9 @@ func (_m *IThumbService) ListProcess() *[]entity.ThumbProcess {
 	return r0
 }
 
-// UpdateProcess provides a mock function with given fields: request
-func (_m *IThumbService) UpdateProcess(request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error) {
-	ret := _m.Called(request)
+// UpdateProcess provides a mock function with given fields: ctx, request
+func (_m *IThumbService) UpdateProcess(ctx context.Context, request *ports.UpdateProcessRequest) (*entity.ThumbProcess, error) {
+	ret := _m.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateProcess")
@@ -62,19 +64,19 @@ func (_m *IThumbService) UpdateProcess(request *ports.UpdateProcessRequest) (*en
 
 	var r0 *entity.ThumbProcess
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*ports.UpdateProcessRequest) (*entity.ThumbProcess, error)); ok {
-		return rf(request)
+	if rf, ok := ret.Get(0).(func(context.Context, *ports.UpdateProcessRequest) (*entity.ThumbProcess, error)); ok {
+		return rf(ctx, request)
 	}
-	if rf, ok := ret.Get(0).(func(*ports.UpdateProcessRequest) *entity.ThumbProcess); ok {
-		r0 = rf(request)
+	if rf, ok := ret.Get(0).(func(context.Context, *ports.UpdateProcessRequest) *entity.ThumbProcess); ok {
+		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.ThumbProcess)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*ports.UpdateProcessRequest) error); ok {
-		r1 = rf(request)
+	if rf, ok := ret.Get(1).(func(context.Context, *ports.UpdateProcessRequest) error); ok {
+		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
 	}

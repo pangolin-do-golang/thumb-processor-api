@@ -28,7 +28,7 @@ func NewSQSThumbQueue(c *cfg.Config) (*SQSThumbQueue, error) {
 	}, nil
 }
 
-func (q *SQSThumbQueue) SendEvent(process *entity.ThumbProcess) error {
+func (q *SQSThumbQueue) SendEvent(ctx context.Context, process *entity.ThumbProcess) error {
 	messageBody, err := json.Marshal(process)
 	if err != nil {
 		return err

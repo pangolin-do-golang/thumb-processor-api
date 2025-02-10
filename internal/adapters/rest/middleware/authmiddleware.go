@@ -1,8 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
 )
 
 func AuthMiddleware(allowedUsersFunc func() gin.Accounts) gin.HandlerFunc {
@@ -22,6 +25,10 @@ func AuthMiddleware(allowedUsersFunc func() gin.Accounts) gin.HandlerFunc {
 		}
 
 		c.Set("user", username)
+		loggedUser := users.GetUserByNickname(username)
+
+		ctx := context.WithValue(c.Request.Context(), "logged_user_id", loggedUser.ID)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next() // Continue to the handler
 	}

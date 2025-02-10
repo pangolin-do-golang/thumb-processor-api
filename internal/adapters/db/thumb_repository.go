@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 
 	"github.com/google/uuid"
@@ -9,6 +10,7 @@ import (
 
 type ThumbPostgres struct {
 	BaseModel
+	UserID        int
 	VideoPath     string
 	Status        string
 	Error         string
@@ -23,11 +25,14 @@ type PostgresThumbRepository struct {
 	db IDB
 }
 
-func (r *PostgresThumbRepository) Create(process *entity.ThumbProcess) error {
+func (r *PostgresThumbRepository) Create(ctx context.Context, process *entity.ThumbProcess) error {
+	userID, err := r.getUserID(ctx)
+	if err != nil {
+		return err
+	}
+
 	record := &ThumbPostgres{
-		BaseModel: BaseModel{
-			ID: process.ID,
-		},
+		UserID:        userID,
 		VideoPath:     process.Video.Path,
 		ThumbnailPath: process.Thumbnail.Path,
 		Status:        process.Status,
@@ -36,14 +41,22 @@ func (r *PostgresThumbRepository) Create(process *entity.ThumbProcess) error {
 
 	result := r.db.Create(record)
 
+	process.ID = record.ID
+
 	return result.Error
 }
 
-func (r *PostgresThumbRepository) List() *[]entity.ThumbProcess {
+func (r *PostgresThumbRepository) List(ctx context.Context) *[]entity.ThumbProcess {
 	processes := []entity.ThumbProcess{}
+
+	userID, err := r.getUserID(ctx)
+	if err != nil {
+		return &processes
+	}
+
 	records := []ThumbPostgres{}
 
-	r.db.Find(&records)
+	r.db.Find(&records, "user_id = ?", userID)
 
 	for _, record := range records {
 		processes = append(processes, entity.ThumbProcess{
@@ -66,12 +79,12 @@ func NewPostgresThumbRepository(db IDB) *PostgresThumbRepository {
 	return &PostgresThumbRepository{db: db}
 }
 
-func (r *PostgresThumbRepository) Update(process *entity.ThumbProcess) (*entity.ThumbProcess, error) {
+func (r *PostgresThumbRepository) Update(ctx context.Context, process *entity.ThumbProcess) (*entity.ThumbProcess, error) {
 	if process.ID == uuid.Nil {
 		return nil, errors.New("process id is required")
 	}
 
-	result := r.db.Save(&ThumbPostgres{
+	result := r.db.Updates(&ThumbPostgres{
 		BaseModel: BaseModel{
 			ID: process.ID,
 		},
@@ -96,4 +109,13 @@ func (r *PostgresThumbRepository) Update(process *entity.ThumbProcess) (*entity.
 			Path: process.Thumbnail.Path,
 		},
 	}, nil
+}
+
+func (r *PostgresThumbRepository) getUserID(ctx context.Context) (int, error) {
+	userID, ok := ctx.Value("logged_user_id").(int)
+	if !ok {
+		return 0, RequiredUserIDError
+	}
+
+	return userID, nil
 }

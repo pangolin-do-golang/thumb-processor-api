@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/handler"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/config"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/thumb"
+	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
 )
 
 type RestServer struct {
@@ -21,7 +23,7 @@ func NewRestServer(opts *RestServerOptions) *RestServer {
 	}
 }
 
-func (rs RestServer) Serve() {
+func (rs RestServer) Serve(cfg *config.Config) {
 	r := gin.Default()
 	r.Use(middleware.CorsMiddleware())
 
@@ -32,11 +34,15 @@ func (rs RestServer) Serve() {
 	handler.RegisterUserRoutes(r)
 
 	// Rotes that need authentication
-	handler.RegisterLoginHandlers(r.Group("/"))
+	authorizedGroup := r.Group("/", middleware.AuthMiddleware(users.GetAllowedUsers))
 
-	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(r.Group("/"))
+	handler.RegisterLoginHandlers(authorizedGroup)
 
-	err := r.Run("0.0.0.0:8080")
+	thumbHandler := handler.NewThumbHandler(rs.thumbService)
+	thumbHandler.RegisterRoutes(authorizedGroup)
+	thumbHandler.RegisterInternalRoutes(r)
+
+	err := r.Run("0.0.0.0:" + cfg.API.Port)
 	if err != nil {
 		panic(err)
 	}

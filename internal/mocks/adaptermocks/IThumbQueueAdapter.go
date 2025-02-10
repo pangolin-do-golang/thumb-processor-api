@@ -3,7 +3,10 @@
 package adaptermocks
 
 import (
+	context "context"
+
 	entity "github.com/pangolin-do-golang/thumb-processor-api/internal/core/domain/entity"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -12,17 +15,17 @@ type IThumbQueueAdapter struct {
 	mock.Mock
 }
 
-// SendEvent provides a mock function with given fields: process
-func (_m *IThumbQueueAdapter) SendEvent(process *entity.ThumbProcess) error {
-	ret := _m.Called(process)
+// SendEvent provides a mock function with given fields: ctx, process
+func (_m *IThumbQueueAdapter) SendEvent(ctx context.Context, process *entity.ThumbProcess) error {
+	ret := _m.Called(ctx, process)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SendEvent")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*entity.ThumbProcess) error); ok {
-		r0 = rf(process)
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.ThumbProcess) error); ok {
+		r0 = rf(ctx, process)
 	} else {
 		r0 = ret.Error(0)
 	}

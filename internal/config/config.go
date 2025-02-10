@@ -18,6 +18,11 @@ type Config struct {
 	S3  S3
 	SQS SQS
 	DB  Database
+	API API
+}
+
+type API struct {
+	Port string `env:"API_PORT"`
 }
 
 func Load() (*Config, error) {
