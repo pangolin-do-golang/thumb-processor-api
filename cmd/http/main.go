@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/joho/godotenv"
 	_ "github.com/pangolin-do-golang/thumb-processor-api/docs"
 	dbAdapter "github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/db"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/server"
@@ -20,6 +21,10 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln(err)
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalln(err)
