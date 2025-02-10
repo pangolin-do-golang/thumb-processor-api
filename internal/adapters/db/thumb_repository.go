@@ -25,6 +25,9 @@ type PostgresThumbRepository struct {
 
 func (r *PostgresThumbRepository) Create(process *entity.ThumbProcess) error {
 	record := &ThumbPostgres{
+		BaseModel: BaseModel{
+			ID: process.ID,
+		},
 		VideoPath:     process.Video.Path,
 		ThumbnailPath: process.Thumbnail.Path,
 		Status:        process.Status,

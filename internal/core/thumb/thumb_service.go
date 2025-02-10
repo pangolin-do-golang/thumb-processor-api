@@ -22,7 +22,7 @@ func NewThumbService(repo contracts.IThumbRepositoryAdapter, q contracts.IThumbQ
 }
 
 func (s *Service) CreateProcessAsync(request *ports.CreateProcessRequest) error {
-	thumbProcess := entity.NewThumbProcess(request.Url)
+	thumbProcess := entity.NewThumbProcess(request.Url, request.UserEmail)
 
 	if err := s.processRepository.Create(thumbProcess); err != nil {
 		return err

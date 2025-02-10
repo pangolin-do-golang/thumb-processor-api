@@ -52,8 +52,8 @@ func TestListProcess(t *testing.T) {
 	service := NewThumbService(mockRepo, mockQueue)
 
 	expectedList := &[]entity.ThumbProcess{
-		*entity.NewThumbProcess("https://example.com/video1.mp4"),
-		*entity.NewThumbProcess("https://example.com/video2.mp4"),
+		*entity.NewThumbProcess("https://example.com/video1.mp4", "teste@teste.com"),
+		*entity.NewThumbProcess("https://example.com/video2.mp4", "teste@teste.com"),
 	}
 
 	mockRepo.On("List").Return(expectedList)

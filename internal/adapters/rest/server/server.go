@@ -5,7 +5,6 @@ import (
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/handler"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/adapters/rest/middleware"
 	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/thumb"
-	"github.com/pangolin-do-golang/thumb-processor-api/internal/core/users"
 )
 
 type RestServer struct {
@@ -33,11 +32,9 @@ func (rs RestServer) Serve() {
 	handler.RegisterUserRoutes(r)
 
 	// Rotes that need authentication
-	authorizedGroup := r.Group("/", middleware.AuthMiddleware(users.GetAllowedUsers))
+	handler.RegisterLoginHandlers(r.Group("/"))
 
-	handler.RegisterLoginHandlers(authorizedGroup)
-
-	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(authorizedGroup)
+	handler.NewThumbHandler(rs.thumbService).RegisterRoutes(r.Group("/"))
 
 	err := r.Run("0.0.0.0:8080")
 	if err != nil {
