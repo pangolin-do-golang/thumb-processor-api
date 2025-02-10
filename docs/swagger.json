@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Hackathon",
-        "title": "Thumb processor worker",
+        "title": "Thumb Processor API",
         "contact": {},
         "version": "0.1.0"
     },

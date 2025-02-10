@@ -122,3 +122,19 @@ curl 'http://localhost:8080/login' -H 'Authorization: Basic dGVzdDp0ZXN0'
 ## Creating new users
 
 Use the Swagger for access the endpoint `/user` and create a new user.
+
+## DDD with event storm
+
+The team chose to use [Miro](https://miro.com/) to document this deliverable, available at the [link](https://miro.com/app/board/uXjVLr7Fxbo=/).
+
+The diagram contains:
+
+* System documentation in DDD with Event Storm
+* Caption for the ubiquitous language used
+* Additional details to understand the proposed resolution
+* Worker  flow
+* API flow
+
+![ubiquitous language](./assets/linguagem%20ubiqua.png)
+
+![event storm](./assets/event%20storm.png)
